@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/main.css" type="text/css">
+<style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0; padding: 0 }
+    #map_canvas { height: 800px; width: 600px; }
+</style>
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/app.js" type="text/javascript" charset="utf-8"></script>
+<script src="//maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="map_canvas"></div>
+
+{% endblock %}
+

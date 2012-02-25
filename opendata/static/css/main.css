@@ -1,0 +1,20 @@
+#search-form {
+    width: 600px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 48px;
+    font-family: sans-serif;
+}
+
+#search-form input {
+    font-size: 2em;
+    padding: 4px;
+    float: left;
+}
+
+#search-form button {
+    font-size: 2em;
+    float: right;
+}

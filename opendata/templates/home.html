@@ -1,51 +1,24 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/css/commands.css" type="text/css">
+<link rel="stylesheet" href="/static/css/main.css" type="text/css">
 {% endblock %}
 
 {% block js %}
-<script src="/static/js/commands.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/home.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
 
 {% block content %}
-<ul class="command-list">
-    {% for command in commands %}
-    <li class="command">
-        <form action="{{ command.url }}" method="post" class="command-send">
-            <button type="submit">{{ command.name }}</button>
-        </form>
-        <div class="command-help">?</div>
-        <div class="command-delete" rel="{{ command.url }}">X</div>
-        <pre class="command-template">{{ command.template }}</pre>
-    </li>
-    {% endfor %}
+<div id="search-form">
+    <h1>Fountain of Knowledge</h1>
 
-    <li class="command command-form">
-        <form action="{{ url_for('command_index') }}" method="post" class="command-create">
-            {{ form.csrf_token }}
-
-            <div class="clearfix"></div>
-
-            {% for field in [form.name, form.template, form.target, form.driver] %}
-                <p>{{ field.label }} {{ field|safe }}</p>
-
-                {% if field.errors %}
-                    <ul class="errors">
-                        {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endfor %}
-
-            <button type="submit" id="create-button">Create</button>
-        </form>
-
-    </li>
-    
-</ul>
-
-
+    <form action='/map' method='GET'>
+        <p>
+            <input type="text" name="query" id="query"/>
+            <button type="submit" id="search">Search!</button>
+        </p>
+        <div style="clear:both"></div>
+    </form>
+</div>
 {% endblock %}
 
