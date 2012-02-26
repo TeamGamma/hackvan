@@ -9,11 +9,22 @@ $(function() {
 
   initialize(fountain_search);
 
+
+  $('#find-closest').click(function() {
+    $.getJSON('/fountains/closest/'+centre.x+','+centre.y, function(data) {
+      var closest = new GLatLng(data.latitude, data.longitude);  //fountain location from mysql db
+      var marker = new GMarker(closest);
+      map.addOverlay(marker);
+
+      marker.openInfoWindow(document.createTextNode("Closest fountain"));
+    });
+  });
 });
 
 
 var map = null;
 var geocoder = null;
+var centre;
 
 //intilize the map
 function initialize(fountain_search) {
@@ -24,17 +35,15 @@ function initialize(fountain_search) {
         geocoder = new GClientGeocoder();
         geocoder.getLatLng(fountain_search, function(point) {
             console.log(point);
+            centre = point;
+
             //set the center of the map based on the user input search
             map.setCenter(point, 13);
 
-            $.getJSON('/fountains/closest/'+point.x+','+point.y, function(data) {
-              var closest = new GLatLng(data.latitude, data.longitude);  //fountain location from mysql db
-              var marker = new GMarker(closest);
-              map.addOverlay(marker);
+            var marker = new GMarker(point);
+            map.addOverlay(marker);
+            marker.openInfoWindow(document.createTextNode("You are here!"));
 
-              marker.openInfoWindow(document.createTextNode("Closest fountain"));
-            });
-            
             $.getJSON('/fountains', function(data) {
 
               $.each(data, function(index, fountain) {
@@ -52,6 +61,7 @@ function initialize(fountain_search) {
 
          });
     }
+    
 }
 
 
