@@ -2,11 +2,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="/static/css/main.css" type="text/css">
-<style type="text/css">
-    html { height: 100% }
-    body { height: 100%; margin: 0; padding: 0 }
-    #map_canvas { height: 600px; width: 800px; }
-</style>
 {% endblock %}
 
 {% block js %}
@@ -16,8 +11,13 @@
 
 {% block content %}
 
-<div id="map_canvas"></div>
-<button id="find-closest">Find Closest Fountain</button>
+<div id="map_box">
+    <div id="map_canvas"></div>
+</div>
+
+<div id="controls_box">
+    <button id="find-closest">Find Closest Fountain</button>
+</div>
 
 {% endblock %}
 

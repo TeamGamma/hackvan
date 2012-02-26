@@ -1,3 +1,8 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
 #search-form {
     width: 600px;
     margin: 0 auto;
@@ -20,5 +25,40 @@ h1 {
 }
 
 #find-closest {
-    font-size: 2em;
+    font-size: 1.5em;
+    padding: 10px;
+    margin: 24px;
 }
+#map_box {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 101px;
+}
+#map_canvas {
+    height: 100%;
+    width: 100%;
+}
+
+#controls_box {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    height: 100px;
+    bottom: 0px;
+    background-color: #E8E4E2;
+    border-top: 1px solid silver;
+}
+
+#controls_box {
+    background: -moz-linear-gradient(top, #ffffff 0%, #e8e4e2 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e8e4e2)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%,#e8e4e2 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ffffff 0%,#e8e4e2 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ffffff 0%,#e8e4e2 100%); /* IE10+ */
+    background: linear-gradient(top, #ffffff 0%,#e8e4e2 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8e4e2',GradientType=0 ); /* IE6-9 */
+}
+
+
