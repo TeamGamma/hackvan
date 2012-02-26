@@ -11,7 +11,7 @@ $(function() {
 
 
   $('#find-closest').click(function() {
-    $.getJSON('/fountains/closest/'+centre.x+','+centre.y, function(data) {
+    $.getJSON('/fountains/closest/'+centre.lat()+','+centre.lng(), function(data) {
       var closest = new GLatLng(data.latitude, data.longitude);  //fountain location from mysql db
       var marker = new GMarker(closest);
       map.addOverlay(marker);
@@ -55,13 +55,11 @@ function initialize(fountain_search) {
 
                 //marker.openInfoWindow(document.createTextNode(fountain_name));
               });
-              
 
             });
 
          });
     }
-    
 }
 
 
