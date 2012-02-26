@@ -16,12 +16,13 @@ h1 {
 #search-form input {
     font-size: 2em;
     padding: 4px;
+    height: 40px;
     float: left;
 }
 
 #search-form button {
     font-size: 2em;
-    float: right;
+    height: 50px;
 }
 
 #find-closest {
