@@ -1,7 +1,7 @@
 from fountains import app
 from flaskext.sqlalchemy import SQLAlchemy
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://fountains:fountains@127.0.0.1:3306/fountains'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://opendata:opendata@127.0.0.1:3306/opendata'
 db = SQLAlchemy(app)
 
 class Fountain(db.Model):

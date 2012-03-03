@@ -13,6 +13,10 @@ h1 {
     font-family: sans-serif;
 }
 
+#search-form p {
+    margin-bottom: 50px;
+}
+
 #search-form input {
     font-size: 2em;
     padding: 4px;
