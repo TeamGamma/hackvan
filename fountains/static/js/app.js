@@ -33,8 +33,8 @@ function initialize(fountain_search) {
         geocoder.getLatLng(fountain_search, function(point) {
             centre = point;
 
-            //set the center of the map based on the user input search
-            map.setCenter(point, 13);
+            //set the center of the map based on the point returned by the geocoder
+            map.setCenter(point, 16);
 
             var marker = new GMarker(point);
             map.addOverlay(marker);
