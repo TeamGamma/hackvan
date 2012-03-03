@@ -1,8 +1,8 @@
 from flask import Flask
 import settings
 
-app = Flask('opendata')
-app.config.from_object('opendata.settings')
+app = Flask('fountains')
+app.config.from_object('fountains.settings')
 app.debug = True
 
 import views

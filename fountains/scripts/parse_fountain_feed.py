@@ -11,8 +11,8 @@ try:
 
     with con:
         cur = con.cursor()
-        cur.execute("CREATE DATABASE IF NOT EXISTS opendata")
-        cur.execute("USE opendata")
+        cur.execute("CREATE DATABASE IF NOT EXISTS fountains")
+        cur.execute("USE fountains")
         cur.execute("DROP TABLE IF EXISTS fountain")
         cur.execute("CREATE TABLE IF NOT EXISTS \
                 fountain(ID INT PRIMARY KEY AUTO_INCREMENT, \

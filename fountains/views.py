@@ -1,12 +1,12 @@
-from opendata import app
-from opendata.database import db, Fountain
+from fountains import app
+from fountains.database import db, Fountain
 from flask import (
     request, url_for,
     make_response, redirect, abort, session, flash,
     render_template,
 )
 import json
-from opendata.recommendation import find_closest_fountain
+from fountains.recommendation import find_closest_fountain
 
 import settings
 
