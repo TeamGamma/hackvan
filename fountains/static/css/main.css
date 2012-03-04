@@ -1,39 +1,8 @@
 body {
-    margin: 0;
-    padding: 0;
+    padding-top: 60px;
+    padding-bottom: 40px;
 }
 
-#search-form {
-    width: 600px;
-    margin: 0 auto;
-}
-
-h1 {
-    font-size: 48px;
-    font-family: sans-serif;
-}
-
-#search-form p {
-    margin-bottom: 50px;
-}
-
-#search-form input {
-    font-size: 2em;
-    padding: 4px;
-    height: 40px;
-    float: left;
-}
-
-#search-form button {
-    font-size: 2em;
-    height: 50px;
-}
-
-#find-closest, #get-recommendation {
-    font-size: 1.5em;
-    padding: 10px;
-    margin: 24px;
-}
 #map_box {
     width: 100%;
     position: absolute;

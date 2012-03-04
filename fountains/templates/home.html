@@ -2,6 +2,19 @@
 
 {% block css %}
 <link rel="stylesheet" href="/static/css/main.css" type="text/css">
+
+<style type="text/css">
+#home-callout {
+    height: 250px;
+}
+
+#fountain-pic {
+    background-color: black;
+    padding-top: 23px;
+    border-radius: 6px;
+}
+</style>
+
 {% endblock %}
 
 {% block js %}
@@ -9,18 +22,41 @@
 {% endblock %}
 
 {% block content %}
-<div id="search-form">
-    <h1>Fountain of Knowledge</h1>
+<!-- Main hero unit for a primary marketing message or call to action -->
+<div class="row">
 
-    <form action='/map' method='GET'>
-        <p>
-            <input type="text" name="query" id="query"/>
-            <button type="submit" id="search">Search for Drinking Fountains!</button>
-        </p>
-        <p>
-            <button type="submit" id="geolocation">Find My Location</button>
-        </p>
-    </form>
+    <div class="span8">
+        <div class="hero-unit" id="home-callout">
+            <h1>Find a drinking fountain near you.</h1>
+                <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+            <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+        </div>
+    </div>
+
+    <div class="span4">
+        <img id="fountain-pic" src="/static/img/fountain_dark_300.png" alt="Fountain"/>
+    </div>
+
 </div>
+
+
+<div class="row">
+        <div class="span8">
+            <form action="/map" method="GET" class="well">
+                    <label>Search by location name:</label>
+                    <input type="text" name="query" id="query" class="span6 search-query" />
+                    <button type="submit" id="search" class="btn btn-primary btn-large">Search</button>
+            </form>
+        </div>
+
+        <div class="span4">
+            <div class="well">
+                <label>Search by GPS / Geolocation:</label>
+                <button type="submit" id="geolocation" class="btn btn-large btn-info">Find My Location</button>
+            </div>
+        </div>
+
+</div>
+
 {% endblock %}
 
