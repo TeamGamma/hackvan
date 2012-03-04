@@ -1,7 +1,7 @@
 from fabric.api import *
 
 env.hosts = ['rob@doteight.com']
-remote_repo = '/srv/www/projects/apps/fountain'
+remote_repo = '/srv/www/projects/apps/fountains'
 
 def deploy():
     """ Deploys local version to server and merges into deploy branch """

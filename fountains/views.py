@@ -1,10 +1,6 @@
 from fountains import app
-from fountains.database import db, Fountain
-from flask import (
-    request, url_for,
-    make_response, redirect, abort, session, flash,
-    render_template,
-)
+from fountains.database import db, Fountain, FountainSearch
+from flask import render_template
 import json
 from fountains.recommendation import find_closest_fountain
 
@@ -34,7 +30,15 @@ def closest_fountain(latitude, longitude):
     coords = [(fountain.latitude, fountain.longitude) 
               for fountain in fountains]
     point = find_closest_fountain((latitude, longitude), coords)
-    return json.dumps({"latitude":point[0], "longitude":point[1]})
+
+    # Store a FountainSearch for this search
+    fs = FountainSearch(
+            user_position=(latitude, longitude), 
+            fountain_position=point)
+    db.session.add(fs)
+    db.session.commit()
+
+    return json.dumps({"latitude": point[0], "longitude": point[1]})
 
 
 

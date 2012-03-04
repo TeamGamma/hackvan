@@ -28,13 +28,17 @@ var centre;
 function initialize(fountain_search) {
     if (GBrowserIsCompatible()) {
         map = new GMap2(document.getElementById("map_canvas"));
-
         geocoder = new GClientGeocoder();
         geocoder.getLatLng(fountain_search, function(point) {
             centre = point;
 
             //set the center of the map based on the point returned by the geocoder
             map.setCenter(point, 16);
+
+            // Add zoom control
+            var zoomControl = new GLargeMapControl();
+            map.addControl(zoomControl);
+            map.addControl(new GNavLabelControl());
 
             var marker = new GMarker(point);
             map.addOverlay(marker);
