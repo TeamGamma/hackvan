@@ -48,9 +48,8 @@ function initialize(fountain_search) {
             map.setCenter(point, 16);
 
             // Add zoom control
-            var zoomControl = new GLargeMapControl();
+            var zoomControl = new GLargeMapControl3D();
             map.addControl(zoomControl);
-            map.addControl(new GNavLabelControl());
 
             var marker = new GMarker(point);
             map.addOverlay(marker);
