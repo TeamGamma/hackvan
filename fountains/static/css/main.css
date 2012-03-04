@@ -29,7 +29,7 @@ h1 {
     height: 50px;
 }
 
-#find-closest {
+#find-closest, #get-recommendation {
     font-size: 1.5em;
     padding: 10px;
     margin: 24px;

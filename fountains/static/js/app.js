@@ -18,6 +18,18 @@ $(function() {
     });
   });
 
+  // Find recommendation
+  $('#get-recommendation').click(function() {
+    $.getJSON('/fountains/recommendations', function(data) {
+      var point = new GLatLng(data.latitude, data.longitude);
+      var marker = new GMarker(point);
+      map.addOverlay(marker);
+
+      marker.openInfoWindow(document.createTextNode("Recommended fountain location"));
+    });
+  });
+
+
 });
 
 
