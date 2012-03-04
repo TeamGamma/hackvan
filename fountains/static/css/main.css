@@ -7,25 +7,32 @@ body {
     width: 100%;
     position: absolute;
     left: 0;
-    top: 0;
+    top: 40px;
     bottom: 101px;
 }
+
 #map_canvas {
     height: 100%;
     width: 100%;
 }
 
-#controls_box {
+#map_canvas img {
+    /* Fix for https://github.com/twitter/bootstrap/issues/1552 */
+    max-width: none;
+}
+
+
+#controls-box {
     width: 100%;
     position: absolute;
     left: 0;
-    height: 100px;
+    height: 120px;
     bottom: 0px;
     background-color: #E8E4E2;
     border-top: 1px solid silver;
 }
 
-#controls_box {
+#controls-box {
     background: -moz-linear-gradient(top, #ffffff 0%, #e8e4e2 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e8e4e2)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(top, #ffffff 0%,#e8e4e2 100%); /* Chrome10+,Safari5.1+ */
