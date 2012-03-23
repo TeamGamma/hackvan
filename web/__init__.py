@@ -1,8 +1,8 @@
 from flask import Flask
 import settings
 
-app = Flask('fountains')
-app.config.from_object('fountains.settings')
+app = Flask('web')
+app.config.from_object('web.settings')
 app.debug = True
 
 import views
