@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/main.css" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/app.js" type="text/javascript" charset="utf-8"></script>
+<script src="//maps.google.com/maps?file=api&v=2.x&key=AIzaSyCaHi5oKZKc1iDC7D7eoj0D8GfBYuoknKI"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="map_box">
+    <div id="map_canvas"></div>
+</div>
+
+<div id="controls-box">
+    <button id="find-closest" class="btn btn-large">Find Closest Fountain</button>
+
+    <button id="get-recommendation" class="btn btn-large">Recommendation for New Fountain</button>
+</div>
+
+{% endblock %}
+

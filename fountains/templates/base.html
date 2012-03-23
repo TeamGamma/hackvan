@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>{% block title %}{{ settings.TITLE }}{% endblock %}</title>
+
+
+        <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
+
+        <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <!--<link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">-->
+
+        {% block css %}{% endblock %}
+    </head>
+    <body id="">
+
+        <div class="navbar navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </a>
+              <a class="brand" href="#">Fountain Search</a>
+              <div class="nav-collapse">
+                <ul class="nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                  <li><a href="#contact">Contact</a></li>
+                </ul>
+              </div><!--/.nav-collapse -->
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+        {% block content %}
+
+        {% endblock %}
+        </div>
+
+        <script src="/static/js/jquery.min.js" type="text/javascript" language="en" charset="utf-8"></script>
+        {% block js %}{% endblock %}
+    </body>
+</html>
+
