@@ -1,6 +1,6 @@
-Flask==0.8
-Flask-SQLAlchemy==0.15
-Jinja2==2.6
-MySQL-python==1.2.3
-SQLAlchemy==0.7.5
-Werkzeug==0.8.3
+Flask
+Flask-SQLAlchemy
+Jinja2
+MySQL-python
+SQLAlchemy
+Werkzeug
