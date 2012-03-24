@@ -17,7 +17,7 @@ class Player(InitMixin, ReprMixin, db.Model):
     phone = db.Column(db.String(140), primary_key=True, nullable=False)
     game_id = db.Column(db.String(140), db.ForeignKey(Game.id), nullable=True)
     points = db.Column(db.Integer, nullable=False, default=0)
-    answer = db.Column(db.String(140)), nullable=True)
+    answer = db.Column(db.String(140), nullable=True)
 
 
 class Round(InitMixin, ReprMixin, db.Model):

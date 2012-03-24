@@ -37,7 +37,6 @@ def handle_player_text(phone, message, details={}):
     Handles a text from a player.
     """
     app.logger.debug('Processing a message from %s: "%s"', phone, message)
-
     # TODO: validate phone number and message length
 
     # Find the player using the phone number, or create a new one
@@ -60,6 +59,8 @@ def handle_player_text(phone, message, details={}):
     else:
         app.logger.debug('Player %s is already known, game is %s', player.phone, player.game.id)
         return 'You just guessed "%s". Rest of game is not implemented yet' % message
+    
+
 
 
 def find_game(message, details={}):
@@ -76,7 +77,7 @@ def process_message():
     app.logger.debug('Phone number = %s\nMessage = %s',
             phone_num, message)
     message = handle_player_text(phone_num, message)
-    message = "Received"
+    app.logger.debug("Sending %s to User", message)
     resp = twilio.twiml.Response()
     resp.sms(message)
     #app.logger.debug(str(resp))
