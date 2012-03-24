@@ -75,7 +75,7 @@ def process_message():
     message = request.form['Body']
     app.logger.debug('Phone number = %s\nMessage = %s',
             phone_num, message)
-    # message = -- Call Rob's Function --
+    message = handle_player_text(phone_num, message)
     message = "Received"
     resp = twilio.twiml.Response()
     resp.sms(message)
