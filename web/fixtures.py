@@ -1,13 +1,13 @@
 from web.database import db
 from web.models import (
-    User, Game, Round, Hint,
+    Player, Game, Round, Hint,
 )
 
 # Re-create all tables
 db.drop_all()
 db.create_all()
 
-user = User(phone='6048916649', points=0)
+player = Player(phone='6048916649', points=0)
 game = Game(id='game_zero', title='Game Zero', description='The first game',
     rounds=[
         Round(round_number=0, answer='Lego', hints=[
@@ -16,11 +16,11 @@ game = Game(id='game_zero', title='Game Zero', description='The first game',
             Hint(position=1, hint="My company slogan is  'the best is never too good'"),
         ]),
     ],
-    players=[user],
+    players=[player],
 )
 
 db.session.add_all([
-    user
+    player
 ])
 db.session.commit()
 

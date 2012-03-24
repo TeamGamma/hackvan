@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block css %}
+{% endblock %}
+
+{% block js %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+
+<div class="row">
+        <div class="span6 well">
+            <form action="/textmessage" method="POST">
+                    <legend>Fake a text message</legend>
+
+                    <label for="phone">From phone number:</label>
+                    <input type="text" class="input-xlarge" name="phone" value="6048916649"/>
+
+                    <label for="message">Message text:</label>
+                    <textarea name="message" id="message" class="span6" rows=4></textarea>
+                    <button type="submit" id="send" class="btn btn-primary btn-large">Send</button>
+            </form>
+        </div>
+
+</div>
+
+{% endblock %}
+
+

@@ -9,13 +9,13 @@ class Game(InitMixin, ReprMixin, db.Model):
     # This is the index of the round in the rounds array
     current_round = db.Column(db.Integer, nullable=False, default=0)
 
-    players = db.relationship('User', backref='game')
+    players = db.relationship('Player', backref='game')
     rounds = db.relationship('Round', backref='game', order_by="Round.round_number")
 
 
-class User(InitMixin, ReprMixin, db.Model):
+class Player(InitMixin, ReprMixin, db.Model):
     phone = db.Column(db.String(140), primary_key=True, nullable=False)
-    game_id = db.Column(db.String(140), db.ForeignKey(Game.id))
+    game_id = db.Column(db.String(140), db.ForeignKey(Game.id), nullable=True)
     points = db.Column(db.Integer, nullable=False, default=0)
 
 

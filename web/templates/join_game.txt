@@ -1,0 +1,1 @@
+Welcome to game "{{ game.title }}", {{ player.phone }}!
