@@ -1,0 +1,4 @@
+Leader Board:
+{% for player in players %}
+{{ player.phone}}: {{ player.points }}
+{% endfor %}

@@ -1,0 +1,4 @@
+The following are the guesses
+{% for player in players %}
+{{ player.answer }}
+{% endfor %}

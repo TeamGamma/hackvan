@@ -1,0 +1,1 @@
+Correct answer for round {{ round.round_number}} of game {{ game.title }} is: {{ round.answer }}

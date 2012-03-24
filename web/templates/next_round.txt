@@ -1,0 +1,1 @@
+Round {{ Round.round_number}} of game {{ Round.game_id }} is finished. Moving to next round!
