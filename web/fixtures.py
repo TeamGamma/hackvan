@@ -14,6 +14,11 @@ game = Game(id='game_zero', title='Game Zero', description='The first game',
             Hint(position=0, hint="Invented in 1949 By Ole Christianson"),
             Hint(position=1, hint="My company slogan is  'the best is never too good'"),
         ]),
+        Round(round_number=1, answer='Lego', hints=[
+            Hint(position=2, hint="Initially only in red and white, but green blue and yellow came shortly after"),
+            Hint(position=0, hint="Invented in 1949 By Ole Christianson"),
+            Hint(position=1, hint="My company slogan is  'the best is never too good'"),
+        ]),
     ],
 )
 

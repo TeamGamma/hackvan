@@ -3,7 +3,7 @@ from web import app
 import settings
 from web.database import db
 from web.models import (
-    Player, Game, Round, Hint,
+    Player, Game
 )
 
 import twilio.twiml
@@ -26,7 +26,11 @@ def text_message():
         # Form submission
         phone = request.form['phone']
         message = request.form['message']
-        return handle_player_text(phone, message)
+        response = handle_player_text(phone, message)
+        if response:
+            return response
+        else:
+            return 'success'
     else:
         # Show text message form
         return render_template('text_message.html', settings=settings)
@@ -46,8 +50,16 @@ def handle_player_text(phone, message, details={}):
         app.logger.debug('Player %s does not exist, creating an account', phone)
         player = Player(phone=phone)
 
-        # Find a game for this player based on the message and optional details
-        player.game = find_game(message.strip(), details)
+        db.session.add(player)
+        db.session.commit()
+
+        # Find a game for this player treating the message as the game id
+        game_id = message.strip()
+        game = Game.query.filter_by(id=message).first()
+        if not game:
+            return render_template('no_game.txt', game_id=game_id)
+
+        player.game_id = game.id
 
         db.session.add(player)
         db.session.commit()
@@ -56,15 +68,136 @@ def handle_player_text(phone, message, details={}):
 
         # Respond with a welcome message
         app.logger.debug('Sending join_game response template back to player')
-        return render_template('join_game.txt', game=player.game, player=player)
+        return player_joined(game, player)
     else:
+        # Player exists, but might not have a game
+        if player.game_id is None:
+            # Find a game for this player treating the message as the game id
+            game_id = message.strip()
+            game = Game.query.filter_by(id=message).first()
+            if not game:
+                return render_template('no_game.txt', game_id=game_id)
+            player.game_id = game.id
+            db.session.add(player)
+            db.session.commit()
+        else:
+            game = player.game
+
         app.logger.debug('Player %s is already known, game is %s', player.phone, player.game.id)
-        return 'You just guessed "%s". Rest of game is not implemented yet' % message
+        return player_guess(game, player, message)
 
 
-def find_game(message, details={}):
-    # TODO: look up game from database
-    return Game.query.first()
+def player_joined(game, player):
+    """ Called when a player successfully joins a game """
+    app.logger.debug('Player joined a game')
+    current_round = game.rounds[game.current_round]
+    hint = current_round.hints[current_round.current_hint]
+
+    # Send confirmation to player along with the current round hint
+    return render_template('join_game.txt', game=player.game, player=player, hint=hint)
+
+
+def player_guess(game, current_player, guess):
+    """ Called when a player makes a guess """
+    app.logger.debug('Player %s just guessed "%s"', current_player.phone, guess)
+
+    # Set the players guess
+    current_player.guess = guess
+    db.session.add(current_player)
+    db.session.commit()
+
+    current_round = game.rounds[game.current_round]
+
+    # Check if all players have guessed
+    round_ready = True
+    for player in game.players:
+        if player.guess is None:
+            round_ready = False
+
+    if round_ready:
+        return guesses_complete(game, current_round)
+
+    return render_template('guess.txt', game=player.game, player=current_player)
+
+
+def guesses_complete(game, current_round):
+    """ Called when all players have made their guesses for a round """
+    app.logger.debug('All guesses have been made for game %s, round %s', game.id, current_round.round_number)
+
+    # Collect all the players who guessed the right answer
+    winners = []
+    for player in game.players:
+        if player.guess == current_round.answer:
+            winners.append(player)
+
+    if len(winners) > 0:
+        # One or more people won the round
+        return round_complete(game, current_round, winners)
+
+    current_round.current_hint = (current_round.current_hint + 1) % len(current_round.hints)
+    db.session.add(current_round)
+    db.session.commit()
+
+    if current_round.current_hint == 0:
+        # No more hints - NO POINTS FOR YOU!
+        return round_complete(game, current_round, [])
+
+    current_hint = current_round.hints[current_round.current_hint]
+    broadcast_message([player.phone for player in game.players],
+        render_template('next_hint.txt', game=game, round=current_round, hint=current_hint))
+
+    # Don't send anything back to this user directly
+    return None
+
+
+def round_complete(game, current_round, winners):
+    """ Called when a round has ended """
+    app.logger.debug('Game %s, round %s is now over', game.id, current_round.round_number)
+
+    # Advance to the next round and reset this one to the first hint
+    current_round.current_hint = 0
+    game.current_round = (game.current_round + 1) % len(game.rounds)
+    current_round = game.rounds[game.current_round]
+
+    db.session.add(game)
+    db.session.add(current_round)
+    db.session.commit()
+
+    if len(winners) > 0:
+        # Display leaderboard
+        broadcast_message([player.phone for player in game.players],
+            render_template('round_complete_success.txt', game=game, round=current_round, winners=winners))
+    else:
+        # Chastise the players
+        broadcast_message([player.phone for player in game.players],
+            render_template('round_complete_fail.txt', game=game, round=current_round))
+
+    if game.current_round == 0:
+        # Game over, clear game and send results
+        return game_complete(game)
+
+    # Display next hint
+    broadcast_message([player.phone for player in game.players],
+        render_template('next_hint.txt', game=game, round=current_round, hint=current_round.current_hint))
+
+    # Don't send anything back to this user directly
+    return None
+
+def game_complete(game):
+    """ Called when a game has ended """
+    app.logger.debug('Game %s is now over', game.id)
+    for player in game.players:
+        player.game_id = None
+        db.session.add(player)
+
+    db.session.commit()
+
+    # Display leaderboard
+    broadcast_message([player.phone for player in game.players],
+        render_template('game_over.txt', game=game))
+
+    # Don't send anything back to this user directly
+    return None
 
 
 @app.route("/sms", methods=['POST'])
@@ -75,16 +208,23 @@ def process_message():
     message = request.form['Body']
     app.logger.debug('Phone number = %s\nMessage = %s',
             phone_num, message)
+
     message = handle_player_text(phone_num, message)
-    message = "Received"
+
     resp = twilio.twiml.Response()
-    resp.sms(message)
-    #app.logger.debug(str(resp))
+
+    # Don't send a SMS message back if None was returned
+    if message is not None:
+        resp.sms(message)
+
     return str(resp)
 
 
-def reply_message(numbers, message):
+def broadcast_message(numbers, message):
     """ Send a broadcast text message """
+    app.logger.debug('BROADCAST: "%s" => %s', message, numbers)
+    return  # FIXME
+
     client = TwilioRestClient(account, token)
     for number in numbers:
         client.sms.messages.create(to=number,

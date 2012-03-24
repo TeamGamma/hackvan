@@ -17,7 +17,7 @@ class Player(InitMixin, ReprMixin, db.Model):
     phone = db.Column(db.String(140), primary_key=True, nullable=False)
     game_id = db.Column(db.String(140), db.ForeignKey(Game.id), nullable=True)
     points = db.Column(db.Integer, nullable=False, default=0)
-    answer = db.Column(db.String(140)), nullable=True)
+    guess = db.Column(db.String(140), nullable=True)
 
 
 class Round(InitMixin, ReprMixin, db.Model):
@@ -25,6 +25,7 @@ class Round(InitMixin, ReprMixin, db.Model):
     round_number = db.Column(db.Integer, nullable=False)
     game_id = db.Column(db.String(140), db.ForeignKey(Game.id))
     answer = db.Column(db.String(140), nullable=False)
+    current_hint = db.Column(db.Integer, nullable=False, default=0)
 
     hints = db.relationship('Hint', backref='round', order_by="Hint.position")
 
@@ -34,6 +35,5 @@ class Hint(InitMixin, ReprMixin, db.Model):
     round_id = db.Column(db.Integer, db.ForeignKey(Round.id))
     hint = db.Column(db.String(140), nullable=False)
     position = db.Column(db.Integer, nullable=False)
-    current_hint = db.Column(db.Integer, nullable=False, default=0)
 
 
