@@ -7,7 +7,6 @@ from web.models import (
 db.drop_all()
 db.create_all()
 
-player = Player(phone='6048916649', points=0)
 game = Game(id='game_zero', title='Game Zero', description='The first game',
     rounds=[
         Round(round_number=0, answer='Lego', hints=[
@@ -16,11 +15,10 @@ game = Game(id='game_zero', title='Game Zero', description='The first game',
             Hint(position=1, hint="My company slogan is  'the best is never too good'"),
         ]),
     ],
-    players=[player],
 )
 
 db.session.add_all([
-    player
+    game
 ])
 db.session.commit()
 
