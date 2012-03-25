@@ -1,1 +1,4 @@
-Game {{ game.title }} is over. Winner is {{ winner.phone }}
+Game {{ game.title }} is over. Winner is {{ winner.phone }} with {{ winner.points }} points.
+{% for player in game.players %}
+{{ player.phone }}: {{ player.points }}
+{% endfor %}

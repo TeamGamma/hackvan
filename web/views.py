@@ -197,6 +197,7 @@ def game_complete(game):
     winning_score = -1
     for player in game.players:
         if player.points > winning_score:
+            winning_score = player.points
             winner = player
 
     # Display leaderboard
