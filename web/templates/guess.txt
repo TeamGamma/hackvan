@@ -1,1 +1,2 @@
-guess
+Your guess is now "{{ player.guess }}".
+Waiting for guesses from all participants!

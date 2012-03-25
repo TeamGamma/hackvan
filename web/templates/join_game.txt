@@ -1,1 +1,2 @@
 Welcome to game {{ game.title }}, {{ player.phone }}!
+Hint {{ hint.position }}: {{ hint.hint }}

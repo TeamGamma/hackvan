@@ -40,6 +40,7 @@ def handle_player_text(phone, message, details={}):
     """
     Handles a text from a player.
     """
+    message = message.lower()
     app.logger.debug('Processing a message from %s: "%s"', phone, message)
 
     # TODO: validate phone number and message length
@@ -128,7 +129,11 @@ def guesses_complete(game, current_round):
     winners = []
     for player in game.players:
         if player.guess == current_round.answer:
+            player.points += 1
             winners.append(player)
+        player.guess = None
+        db.session.add(player)
+    db.session.commit()
 
     if len(winners) > 0:
         # One or more people won the round
@@ -177,8 +182,9 @@ def round_complete(game, current_round, winners):
         return game_complete(game)
 
     # Display next hint
+    hint = current_round.hints[current_round.current_hint]
     broadcast_message([player.phone for player in game.players],
-        render_template('next_hint.txt', game=game, round=current_round, hint=current_round.current_hint))
+        render_template('next_hint.txt', game=game, round=current_round, hint=hint))
 
     # Don't send anything back to this user directly
     return None
@@ -186,16 +192,22 @@ def round_complete(game, current_round, winners):
 def game_complete(game):
     """ Called when a game has ended """
     app.logger.debug('Game %s is now over', game.id)
+
+    winner = None
+    winning_score = -1
+    for player in game.players:
+        if player.points > winning_score:
+            winner = player
+
+    # Display leaderboard
+    broadcast_message([player.phone for player in game.players],
+        render_template('game_over.txt', game=game, winner=winner))
+
     for player in game.players:
         player.game_id = None
         db.session.add(player)
 
     db.session.commit()
-
-    # Display leaderboard
-    broadcast_message([player.phone for player in game.players],
-        render_template('game_over.txt', game=game))
-
     # Don't send anything back to this user directly
     return None
 
@@ -223,7 +235,6 @@ def process_message():
 def broadcast_message(numbers, message):
     """ Send a broadcast text message """
     app.logger.debug('BROADCAST: "%s" => %s', message, numbers)
-    return  # FIXME
 
     client = TwilioRestClient(account, token)
     for number in numbers:

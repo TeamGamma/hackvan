@@ -1,1 +1,2 @@
-round_complete_success
+Correct answer for round {{ round.round_number}} of game {{ game.title }} is: {{ round.answer }}.
+Players who got it right: {% for player in winners %}{{ player.phone }}{% endfor %}
