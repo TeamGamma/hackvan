@@ -159,15 +159,6 @@ def round_complete(game, current_round, winners):
     """ Called when a round has ended """
     app.logger.debug('Game %s, round %s is now over', game.id, current_round.round_number)
 
-    # Advance to the next round and reset this one to the first hint
-    current_round.current_hint = 0
-    game.current_round = (game.current_round + 1) % len(game.rounds)
-    current_round = game.rounds[game.current_round]
-
-    db.session.add(game)
-    db.session.add(current_round)
-    db.session.commit()
-
     if len(winners) > 0:
         # Display leaderboard
         broadcast_message([player.phone for player in game.players],
@@ -176,6 +167,15 @@ def round_complete(game, current_round, winners):
         # Chastise the players
         broadcast_message([player.phone for player in game.players],
             render_template('round_complete_fail.txt', game=game, round=current_round))
+
+    # Advance to the next round and reset this one to the first hint
+    current_round.current_hint = 0
+    game.current_round = (game.current_round + 1) % len(game.rounds)
+    current_round = game.rounds[game.current_round]
+
+    db.session.add(game)
+    db.session.add(current_round)
+    db.session.commit()
 
     if game.current_round == 0:
         # Game over, clear game and send results
