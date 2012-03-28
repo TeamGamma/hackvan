@@ -1,5 +1,4 @@
-import sys
-from flask import render_template, request
+from flask import render_template, request, session, flash, url_for, redirect
 from web import app
 import settings
 from web.database import db
@@ -20,6 +19,9 @@ def fake_message():
     """
     Web interface for faking text messages.
     """
+    # Mark this user as a web interface user
+    session['user_type'] = 'web'
+
     # Form submission
     if request.method == 'POST':
         app.logger.debug(repr(dict(request.form)))
@@ -33,9 +35,9 @@ def fake_message():
         db.session.commit()
 
         if response:
-            return response
-        else:
-            return 'success'
+            flash(response)
+
+        return redirect(url_for('fake_message'))
     else:
         # Show text message form
         return render_template('text_message.html', settings=settings)
@@ -216,8 +218,6 @@ def game_complete(game):
         if player.points > winning_score:
             winning_score = player.points
             winner = player
-        # Reset player's points
-        player.points = 0
 
     # Display leaderboard
     broadcast_message([player.phone for player in game.players],
@@ -226,6 +226,9 @@ def game_complete(game):
     # Kick all players out of this game
     for player in game.players:
         player.game_id = None
+
+        # Reset player's points
+        player.points = 0
 
     # Don't send anything back to this user directly
     return None
@@ -237,8 +240,10 @@ def broadcast_message(numbers, message):
     """
     app.logger.debug('BROADCAST: "%s" => %s', message, numbers)
 
-    # Don't actually send text messages in debug mode
-    if app.debug:
+    # For web interface users, add to flash messages
+    if 'user_type' in session and session['user_type'] == 'web':
+        # TODO: check if this message is for current user
+        flash(message, 'broadcast')
         return
 
     app.logger.debug('Sending message to Twilio')

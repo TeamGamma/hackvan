@@ -7,8 +7,30 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
 
+<!-- Display flash messages -->
+<div class="row" style="padding-top: 20px">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+    {% if category and category == 'broadcast' %}
+    <div class="alert alert-block alert-info">
+        <a class="close" data-dismiss="alert">×</a>
+        <h4 class="alert-heading">Broadcast message:</h4>
+        {{ message|replace('\n', '<br/>')|safe }}
+    </div>
+    {% else %}
+    <div class="alert alert-block alert-success">
+        <a class="close" data-dismiss="alert">×</a>
+        {{ message|replace('\n', '<br/>')|safe }}
+    </div>
+    {% endif %}
+{% endfor %}
+{% endif %}
+{% endwith %}
+</div>
+
+<!-- Display form -->
 <div class="row">
         <div class="span6 well">
             <form action="/textmessage" method="POST">
