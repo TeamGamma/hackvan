@@ -16,7 +16,7 @@ def home():
 
 # TODO: add support for flash messages and fake twilio requests
 @app.route('/textmessage', methods=['GET', 'POST'])
-def text_message():
+def fake_message():
     """
     Web interface for faking text messages.
     """
@@ -42,7 +42,7 @@ def text_message():
 
 
 @app.route("/sms", methods=['POST'])
-def process_message():
+def twilio_message():
     """
     Respond to incoming text messages from Twilio.
     """
