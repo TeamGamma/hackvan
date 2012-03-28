@@ -1,3 +1,4 @@
+import sys
 from flask import render_template, request
 from web import app
 import settings
@@ -8,25 +9,29 @@ from web.models import (
 
 import twilio.twiml
 from twilio.rest import TwilioRestClient
-account = "AC97ac1adb110109f39f1f68f8019155c2"
-token = "0961b98002d01f307b7893ac695feadd"
 
 @app.route('/', methods=['GET'])
 def home():
     return render_template('index.html', settings=settings)
 
+# TODO: add support for flash messages and fake twilio requests
 @app.route('/textmessage', methods=['GET', 'POST'])
 def text_message():
     """
     Web interface for faking text messages.
     """
-    app.logger.debug(repr(dict(request.form)))
-
+    # Form submission
     if request.method == 'POST':
-        # Form submission
+        app.logger.debug(repr(dict(request.form)))
         phone = request.form['phone']
         message = request.form['message']
+
+        # Call the main text message handler
         response = handle_player_text(phone, message)
+
+        # Persist all changes to the database
+        db.session.commit()
+
         if response:
             return response
         else:
@@ -36,24 +41,52 @@ def text_message():
         return render_template('text_message.html', settings=settings)
 
 
+@app.route("/sms", methods=['POST'])
+def process_message():
+    """
+    Respond to incoming text messages from Twilio.
+    """
+    app.logger.debug("Message from Twilio: %s", repr(dict(request.form)))
+    phone_num = request.form['From']
+    message = request.form['Body']
+    app.logger.debug('Phone number = %s\nMessage = %s',
+            phone_num, message)
+
+    # Call the main text message handler
+    message = handle_player_text(phone_num, message)
+    # Persist changes to the database
+    db.session.commit()
+
+    resp = twilio.twiml.Response()
+
+    # Don't send a SMS message back if None was returned
+    if message is not None:
+        resp.sms(message)
+
+    return str(resp)
+
+
+
 def handle_player_text(phone, message, details={}):
     """
-    Handles a text from a player.
+    Handles an incoming text from a player.
     """
     message = message.lower()
     app.logger.debug('Processing a message from %s: "%s"', phone, message)
 
     # TODO: validate phone number and message length
 
-    # Find the player using the phone number, or create a new one
-    player = Player.query.filter_by(phone=phone).first()
-    if not player:
-        app.logger.debug('Player %s does not exist, creating an account', phone)
-        player = Player(phone=phone)
+    player, created = Player.get_or_create(phone)
+    if created:
+        app.logger.debug('Created an account for player %s', phone)
 
-        db.session.add(player)
-        db.session.commit()
+    if player.game_id is not None:
+        # Player is already in a game
+        game = player.game
 
+        app.logger.debug('Player %s is already known, game is %s', player.phone, player.game.title)
+        return player_guess(game, player, message)
+    else:
         # Find a game for this player treating the message as the game id
         game_id = message.strip()
         game = Game.query.filter_by(id=message).first()
@@ -62,34 +95,17 @@ def handle_player_text(phone, message, details={}):
 
         player.game_id = game.id
 
-        db.session.add(player)
-        db.session.commit()
-
         # TODO: notify other players that player has joined
 
         # Respond with a welcome message
         app.logger.debug('Sending join_game response template back to player')
         return player_joined(game, player)
-    else:
-        # Player exists, but might not have a game
-        if player.game_id is None:
-            # Find a game for this player treating the message as the game id
-            game_id = message.strip()
-            game = Game.query.filter_by(id=message).first()
-            if not game:
-                return render_template('no_game.txt', game_id=game_id)
-            player.game_id = game.id
-            db.session.add(player)
-            db.session.commit()
-        else:
-            game = player.game
-
-        app.logger.debug('Player %s is already known, game is %s', player.phone, player.game.id)
-        return player_guess(game, player, message)
 
 
 def player_joined(game, player):
-    """ Called when a player successfully joins a game """
+    """
+    Called when a player successfully joins a game.
+    """
     app.logger.debug('Player joined a game')
     current_round = game.rounds[game.current_round]
     hint = current_round.hints[current_round.current_hint]
@@ -99,14 +115,15 @@ def player_joined(game, player):
 
 
 def player_guess(game, current_player, guess):
-    """ Called when a player makes a guess """
+    """
+    Called when a player makes a guess.
+    """
     app.logger.debug('Player %s just guessed "%s"', current_player.phone, guess)
 
     # Set the players guess
     current_player.guess = guess
-    db.session.add(current_player)
-    db.session.commit()
 
+    # Get the current round
     current_round = game.rounds[game.current_round]
 
     # Check if all players have guessed
@@ -122,7 +139,9 @@ def player_guess(game, current_player, guess):
 
 
 def guesses_complete(game, current_round):
-    """ Called when all players have made their guesses for a round """
+    """
+    Called when all players have made their guesses for a round.
+    """
     app.logger.debug('All guesses have been made for game %s, round %s', game.id, current_round.round_number)
 
     # Collect all the players who guessed the right answer
@@ -132,16 +151,12 @@ def guesses_complete(game, current_round):
             player.points += 1
             winners.append(player)
         player.guess = None
-        db.session.add(player)
-    db.session.commit()
 
     if len(winners) > 0:
         # One or more people won the round
         return round_complete(game, current_round, winners)
 
     current_round.current_hint = (current_round.current_hint + 1) % len(current_round.hints)
-    db.session.add(current_round)
-    db.session.commit()
 
     if current_round.current_hint == 0:
         # No more hints - NO POINTS FOR YOU!
@@ -156,7 +171,10 @@ def guesses_complete(game, current_round):
 
 
 def round_complete(game, current_round, winners):
-    """ Called when a round has ended """
+    """
+    Called when a round has ended. winners is a list of players who
+    guessed correctly.
+    """
     app.logger.debug('Game %s, round %s is now over', game.id, current_round.round_number)
 
     if len(winners) > 0:
@@ -173,10 +191,6 @@ def round_complete(game, current_round, winners):
     game.current_round = (game.current_round + 1) % len(game.rounds)
     current_round = game.rounds[game.current_round]
 
-    db.session.add(game)
-    db.session.add(current_round)
-    db.session.commit()
-
     if game.current_round == 0:
         # Game over, clear game and send results
         return game_complete(game)
@@ -189,8 +203,11 @@ def round_complete(game, current_round, winners):
     # Don't send anything back to this user directly
     return None
 
+
 def game_complete(game):
-    """ Called when a game has ended """
+    """
+    Called when a game has ended.
+    """
     app.logger.debug('Game %s is now over', game.id)
 
     winner = None
@@ -199,47 +216,35 @@ def game_complete(game):
         if player.points > winning_score:
             winning_score = player.points
             winner = player
+        # Reset player's points
+        player.points = 0
 
     # Display leaderboard
     broadcast_message([player.phone for player in game.players],
         render_template('game_over.txt', game=game, winner=winner))
 
+    # Kick all players out of this game
     for player in game.players:
         player.game_id = None
-        db.session.add(player)
 
-    db.session.commit()
     # Don't send anything back to this user directly
     return None
 
 
-@app.route("/sms", methods=['POST'])
-def process_message():
-    """Respond to incoming text messages """
-    app.logger.debug(repr(dict(request.form)))
-    phone_num = request.form['From']
-    message = request.form['Body']
-    app.logger.debug('Phone number = %s\nMessage = %s',
-            phone_num, message)
-
-    message = handle_player_text(phone_num, message)
-
-    resp = twilio.twiml.Response()
-
-    # Don't send a SMS message back if None was returned
-    if message is not None:
-        resp.sms(message)
-
-    return str(resp)
-
-
 def broadcast_message(numbers, message):
-    """ Send a broadcast text message """
+    """
+    Send a broadcast text message with Twilio.
+    """
     app.logger.debug('BROADCAST: "%s" => %s', message, numbers)
 
-    client = TwilioRestClient(account, token)
+    # Don't actually send text messages in debug mode
+    if app.debug:
+        return
+
+    app.logger.debug('Sending message to Twilio')
+    client = TwilioRestClient(settings.TWILIO_ACCOUNT, settings.TWILIO_TOKEN)
     for number in numbers:
         client.sms.messages.create(to=number,
-                from_="+17788002763",
+                from_=settings.TWILIO_NUMBER,
                 body=message)
 

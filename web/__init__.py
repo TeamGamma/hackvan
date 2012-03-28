@@ -3,7 +3,6 @@ import settings
 
 app = Flask('web')
 app.config.from_object('web.settings')
-app.debug = True
 
 import views
 

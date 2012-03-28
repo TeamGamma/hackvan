@@ -1,6 +1,12 @@
 from web.database import db
 from web.utils import ReprMixin, InitMixin
 
+class NoMoreRounds(Exception):
+    pass
+
+class NoMoreHints(Exception):
+    pass
+
 class Game(InitMixin, ReprMixin, db.Model):
     id = db.Column(db.String(140), primary_key=True, nullable=False)
     title = db.Column(db.String(140), primary_key=True, nullable=False)
@@ -18,6 +24,17 @@ class Player(InitMixin, ReprMixin, db.Model):
     game_id = db.Column(db.String(140), db.ForeignKey(Game.id), nullable=True)
     points = db.Column(db.Integer, nullable=False, default=0)
     guess = db.Column(db.String(140), nullable=True)
+
+    @staticmethod
+    def get_or_create(phone):
+        """ Returns the player for a given phone number and True if their
+        account was just created. """
+        player = Player.query.filter_by(phone=phone).first()
+        if not player:
+            player = Player(phone=phone)
+            db.session.add(player)
+            return player, True
+        return player, False
 
 
 class Round(InitMixin, ReprMixin, db.Model):
