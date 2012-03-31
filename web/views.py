@@ -121,6 +121,9 @@ def player_guess(game, current_player, guess):
     Called when a player makes a guess.
     """
     app.logger.debug('Player %s just guessed "%s"', current_player.phone, guess)
+    
+                
+    
 
     # Set the players guess
     current_player.guess = guess
@@ -133,6 +136,11 @@ def player_guess(game, current_player, guess):
     for player in game.players:
         if player.guess is None:
             round_ready = False
+
+    # if player guess = exit, then drop them from the game
+    if guess=="exit":
+        current_player.game_id = None
+        return render_template('exit.txt')
 
     if round_ready:
         return guesses_complete(game, current_round)
